@@ -559,7 +559,7 @@ M.gold.envMap=cubeRT.texture; M.gold.envMapIntensity=.8;
 
 /* ---------- まとめ描画の設定 ---------- */
 const BK={};
-const TILE={tapia:5.4,tapiaL:5.4,cal:4,teja:2.6,yes:1.4,zel:.7,muq:1.4,art:3,marbW:2.4,stone:4.8,rust:4.4,emp:3,gravel:6,earth:10,forestF:8,lawn:10,hedge:3,leaf:3,cyp:2,flower:3,wood:1.5,water:20};
+const TILE={tapia:7,tapiaL:5.4,cal:4,teja:2.6,yes:2.6,zel:1.5,muq:2.4,art:4.5,marbW:2.4,stone:4.8,rust:4.4,emp:2.4,gravel:6,earth:10,forestF:8,lawn:10,hedge:3,leaf:3,cyp:2,flower:3,wood:1.5,water:20};
 const OWNUV={muqD:1,arc:1,door:1,comares:1,celL:1,celS:1,reyes:1,jet:1,flagA:1,flagC:1,house:1};
 const NOCAST={celL:1,celS:1,jet:1,lawn:1,gravel:1,emp:1,earth:1,forestF:1,marbW:1,water:1,flower:1,reyes:1,art:1,muq:1,comares:1};
 function bk(name,group){ group=group||BG; const key=group+':'+name; if(!BK[key]){ const mat=M[name]; if(!mat) throw new Error('no material '+name); BK[key]=new Batch(mat,TILE[name]||2.5,OWNUV[name],group); if(NOCAST[name]) BK[key].cast=false; } return BK[key]; }
@@ -632,16 +632,16 @@ const WT=.7;
 const DOORDECO=[];
 function wallX(zA,zB,a0,a1,h,doors,o){ o=o||{}; const mat=o.mat||'yes'; const ds=(doors||[]).slice().sort((p,q)=>p[0]-q[0]); let s=a0;
   const piece=(u0,u1,y0,y1)=>{ if(u1-u0<.01) return; solidBox(mat,u0,u1,y0,y1,zA,zB); if(o.dado!==false&&y0<.1&&o.dado!=='none'){ if(o.dado!=='B') boxAt('zel',u0,u1,0,1.3,zA-.03,zA); if(o.dado!=='A') boxAt('zel',u0,u1,0,1.3,zB,zB+.03); } };
-  for(const d of ds){ piece(s,d[0],0,h); if(d[2]<h) piece(d[0],d[1],d[2],h); wkRect(d[0]+.1,d[1]-.1,zA-.4,zB+.4,1); if(!d[3]) DOORDECO.push(['x',(d[0]+d[1])/2,d[1]-d[0],d[2],zA,zB]); s=d[1]; }
+  for(const d of ds){ piece(s,d[0],0,h); if(d[2]<h) piece(d[0],d[1],d[2],h); wkRect(d[0]+.1,d[1]-.1,zA-.4,zB+.4,1); if(!d[3]) DOORDECO.push(['x',(d[0]+d[1])/2,d[1]-d[0],d[2],zA,zB,h]); s=d[1]; }
   piece(s,a1,0,h); }
 function wallZ(xA,xB,a0,a1,h,doors,o){ o=o||{}; const mat=o.mat||'yes'; const ds=(doors||[]).slice().sort((p,q)=>p[0]-q[0]); let s=a0;
   const piece=(u0,u1,y0,y1)=>{ if(u1-u0<.01) return; solidBox(mat,xA,xB,y0,y1,u0,u1); if(o.dado!==false&&y0<.1&&o.dado!=='none'){ if(o.dado!=='B') boxAt('zel',xA-.03,xA,0,1.3,u0,u1); if(o.dado!=='A') boxAt('zel',xB,xB+.03,0,1.3,u0,u1); } };
-  for(const d of ds){ piece(s,d[0],0,h); if(d[2]<h) piece(d[0],d[1],d[2],h); wkRect(xA-.4,xB+.4,d[0]+.1,d[1]-.1,1); if(!d[3]) DOORDECO.push(['z',(d[0]+d[1])/2,d[1]-d[0],d[2],xA,xB]); s=d[1]; }
+  for(const d of ds){ piece(s,d[0],0,h); if(d[2]<h) piece(d[0],d[1],d[2],h); wkRect(xA-.4,xB+.4,d[0]+.1,d[1]-.1,1); if(!d[3]) DOORDECO.push(['z',(d[0]+d[1])/2,d[1]-d[0],d[2],xA,xB,h]); s=d[1]; }
   piece(s,a1,0,h); }
 // 扉のアーチ飾り（両面）
-function doorDecos(){ for(const [ax,u,w,dh,A,B] of DOORDECO){ const W=w+1.2, y=dh-.5;
-  if(ax==='x'){ bk('door').add(PLANE,TM(u,y,A-.02,PI,W,2.2,1)); bk('door').add(PLANE,TM(u,y,B+.02,0,W,2.2,1)); }
-  else { bk('door').add(PLANE,TM(A-.02,y,u,-PI/2,W,2.2,1)); bk('door').add(PLANE,TM(B+.02,y,u,PI/2,W,2.2,1)); } } DOORDECO.length=0; }
+function doorDecos(){ for(const [ax,u,w,dh,A,B,hw] of DOORDECO){ let Hh=w/.53/1.17; Hh=Math.min(Hh,(hw-dh-.05)/.26); const W=Hh*1.17, y=dh-.74*Hh+Hh/2;
+  if(ax==='x'){ bk('door').add(PLANE,TM(u,y,A-.02,PI,W,Hh,1)); bk('door').add(PLANE,TM(u,y,B+.02,0,W,Hh,1)); }
+  else { bk('door').add(PLANE,TM(A-.02,y,u,-PI/2,W,Hh,1)); bk('door').add(PLANE,TM(B+.02,y,u,PI/2,W,Hh,1)); } } DOORDECO.length=0; }
 // 中身の詰まった建物（白壁＋瓦屋根）
 function mass(x0,x1,z0,z1,h,o){ o=o||{}; solidBox(o.mat||'cal',x0,x1,0,h||7,z0,z1); if(o.roof!==false) roof(x0,x1,z0,z1,h||7,null,{ov:.3}); if(o.lv!==null) mapR(o.lv||'in','r',[x0,x1,z0,z1],o.mc||'#8a7a68'); }
 // 柱とアーチの列（axis 'x'＝ z=c の線）
@@ -662,7 +662,7 @@ function muqDome(cx,cz,x0,x1,z0,z1,y0,r,h){
   const dr=1.5; bk('yes').add(new THREE.CylinderGeometry(r,r,dr,24,1,true),TM(cx,y0+dr/2,cz,0,1,1,-1));
   for(let k=0;k<16;k++){ const a=k/16*TAU; celWin(cx+Math.cos(a)*(r-.04),y0+dr/2,cz+Math.sin(a)*(r-.04),-a-PI/2,.5,1.0); }
   const pts=[]; for(let k=0;k<=12;k++){ const t=k/12; pts.push([r*Math.cos(t*PI/2)**.9,y0+dr+h*Math.sin(t*PI/2)]); }
-  const lg=lathe(pts,24); const ua=lg.attributes.uv; for(let i=0;i<ua.count;i++) ua.setXY(i,ua.getX(i)*14,ua.getY(i)*5); lg.translate(cx,0,cz); bk('muqD').add(lg);
+  const lg=lathe(pts,24); const ua=lg.attributes.uv; for(let i=0;i<ua.count;i++) ua.setXY(i,ua.getX(i)*9,ua.getY(i)*3); lg.translate(cx,0,cz); bk('muqD').add(lg);
   const CN=new THREE.ConeGeometry(1,1,4); CN.rotateX(PI);
   for(let i=0;i<7;i++){ const t=i/7, rr=r*Math.cos(t*PI/2)**.9*.97, yy=y0+dr+h*Math.sin(t*PI/2)-.1; const n=Math.max(6,Math.round(TAU*rr/.62));
     for(let k=0;k<n;k++){ const a=(k+(i%2)*.5)/n*TAU; bk('muqC').add(CN,TM(cx+Math.cos(a)*rr,yy-.3,cz+Math.sin(a)*rr,-a,.26,.62,.26)); } }
@@ -772,7 +772,7 @@ wallX(-68.7,-68,-84.7,-70,5.5,[]); wallZ(-84.7,-84,-68.7,-62.7,5.5,[]);
 arcade('x',-62,-82.6,-72.1,3,{hc:3.1,ha:1.6,ht:5.5});
 for(const x of [-82,-77.3,-72.6]) celWin(x,3.2,-67.96,0,1.1,2.2,true);
 cyl('marbW',-77.3,0,-55.3,.85,.4,16); patch('water',-78,-76.6,-56,-54.6,.42); cyl('marbW',-77.3,.4,-55.3,.12,.35,8); collideCyl(-77.3,-55.3,.9,0,.5);
-wallZ(-70.7,-70,-68.7,-47.3,9,[[-59.2,-57,3.4,1]],{dado:'none'});
+wallZ(-70.7,-70,-68.7,-47.3,9,[[-59.8,-57,3.65,1]],{dado:'none'});
 bk('comares').add(PLANE,TM(-70.74,4.5,-55,-PI/2,14,9,1)); boxAt('wood',-72.2,-70.7,8.6,8.9,-62.2,-47.8);
 wallX(-48.7,-48,-84,-70,8,[]);
 // 曲がった通路（コマレスへ）
