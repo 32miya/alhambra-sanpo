@@ -659,7 +659,7 @@ function celWin(x,y,z,ry,w,h,see){ bk(see?'celS':'celL').add(PLANE,TM(x,y,z,ry,w
 function muqDome(cx,cz,x0,x1,z0,z1,y0,r,h){
   const sh=new THREE.Shape(); sh.moveTo(x0-cx,-(z0-cz)); sh.lineTo(x1-cx,-(z0-cz)); sh.lineTo(x1-cx,-(z1-cz)); sh.lineTo(x0-cx,-(z1-cz)); sh.closePath(); const hp=new THREE.Path(); hp.absarc(0,0,r,0,TAU,true); sh.holes.push(hp);
   const g=new THREE.ShapeGeometry(sh,24); g.rotateX(PI/2); bk('muq').add(g,TM(cx,y0,cz));
-  const dr=1.5; bk('yes').add(new THREE.CylinderGeometry(r,r,dr,24,1,true),TM(cx,y0+dr/2,cz));
+  const dr=1.5; bk('yes').add(new THREE.CylinderGeometry(r,r,dr,24,1,true),TM(cx,y0+dr/2,cz,0,1,1,-1));
   for(let k=0;k<16;k++){ const a=k/16*TAU; celWin(cx+Math.cos(a)*(r-.04),y0+dr/2,cz+Math.sin(a)*(r-.04),-a-PI/2,.5,1.0); }
   const pts=[]; for(let k=0;k<=12;k++){ const t=k/12; pts.push([r*Math.cos(t*PI/2)**.9,y0+dr+h*Math.sin(t*PI/2)]); }
   const lg=lathe(pts,24); const ua=lg.attributes.uv; for(let i=0;i<ua.count;i++) ua.setXY(i,ua.getX(i)*14,ua.getY(i)*5); lg.translate(cx,0,cz); bk('muqD').add(lg);
@@ -903,30 +903,30 @@ wkDisk(C5.cx,C5.cz,20.2,1); wkRect(C5.x0-.5,-74.5,6.2,9.8,1);
 mapR('out','r',[C5.x0,C5.x1,C5.z0,C5.z1],'#d8c49c','cn'); mapR('out','e',[C5.cx,C5.cz,15,15],'#e8dcc0','cn');
 inEra('a',()=>{ collide(C5.x0,C5.x1,C5.z0,C5.z1,0,20); for(const [x0,x1,z0,z1] of [[-83,-62,-20,4],[-60,-27,-20,4],[-83,-62,7,36],[-60,-27,7,20],[-60,-27,23,36]]){ const h=R(6,8); solidBox('cal',x0,x1,0,h,z0,z1); roof(x0,x1,z0,z1,h,2,{ov:.3}); } mapR('out','r',[C5.x0,C5.x1,C5.z0,C5.z1],'#a8987a','a'); });
 function c5Facades(h1,h2){ const {x0,x1,z0,z1}=C5, t=1.6;
-  for(const [a,b,c,d] of [[x0,x1,z0,z0+t],[x0,x1,z1-t,z1],[x0,x0+t,z0+t,z1-t],[x1-t,x1,z0+t,z1-t]]){ boxAt('rust',a,b,0,Math.min(h1,9),c,d); if(h2>9) boxAt('stone',a,b,9,h2,c,d); }
+  for(const [a,b,c,d,dr] of [[x0,x1,z0,z0+t],[x0,x1,z1-t,z1],[x0,x0+t,z0+t,z1-t,1],[x1-t,x1,z0+t,z1-t]]){ const H1=Math.min(h1,9); if(dr){ boxAt('rust',a,b,0,H1,c,6); boxAt('rust',a,b,0,H1,10,d); if(H1>6) boxAt('rust',a,b,6,H1,6,10); } else boxAt('rust',a,b,0,H1,c,d); if(h2>9) boxAt('stone',a,b,9,h2,c,d); }
   const win=(ax,c,out,u0,u1,n,y,w,hh)=>{ for(let k=0;k<n;k++){ const u=u0+(u1-u0)*(k+.5)/n; if(ax==='x') bk('dark').add(PLANE,TM(u,y,c+out*.03,out>0?0:PI,w,hh,1)); else bk('dark').add(PLANE,TM(c+out*.03,y,u,out>0?PI/2:-PI/2,w,hh,1)); } };
   if(h1>=9){ win('x',z0,-1,x0+3,x1-3,8,4.4,1.4,2.2); win('x',z1,1,x0+3,x1-3,8,4.4,1.4,2.2); win('z',x0,-1,z0+3,z1-3,8,4.4,1.4,2.2); win('z',x1,1,z0+3,z1-3,8,4.4,1.4,2.2); }
   if(h2>=17){ win('x',z0,-1,x0+3,x1-3,8,13,1.6,3); win('x',z1,1,x0+3,x1-3,8,13,1.6,3); win('z',x0,-1,z0+3,z1-3,8,13,1.6,3); win('z',x1,1,z0+3,z1-3,8,13,1.6,3);
     for(let k=0;k<=8;k++){ const u=x0+3+(x1-x0-6)*k/8; boxAt('stone',u-.3,u+.3,9,17,z0-.3,z0); boxAt('stone',u-.3,u+.3,9,17,z1,z1+.3); const w=z0+3+(z1-z0-6)*k/8; boxAt('stone',x0-.3,x0,9,17,w-.3,w+.3); boxAt('stone',x1,x1+.3,9,17,w-.3,w+.3); }
     boxAt('stone',x0-.4,x1+.4,16.6,17.4,z0-.4,z0); boxAt('stone',x0-.4,x1+.4,16.6,17.4,z1,z1+.4); boxAt('stone',x0-.4,x0,16.6,17.4,z0,z1); boxAt('stone',x1,x1+.4,16.6,17.4,z0,z1); boxAt('stone',x0-.3,x1+.3,9,9.4,z0-.3,z0); boxAt('stone',x0-.3,x1+.3,9,9.4,z1,z1+.3); boxAt('stone',x0-.3,x0,9,9.4,z0,z1); boxAt('stone',x1,x1+.3,9,9.4,z0,z1);
     // 西の正面の門
-    for(const z of [4.2,11.8]) for(const y of [0,9.4]) boxAt('marbW',x0-.6,x0,y,y+(y?6.6:8.4),z-.45,z+.45); boxAt('marbW',x0-.8,x0,8.4,9.4,3.2,12.8); boxAt('dark',x0-.04,x0,0,6,6.2,9.8); }
+    for(const z of [4.2,11.8]) for(const y of [0,9.4]) boxAt('marbW',x0-.6,x0,y,y+(y?6.6:8.4),z-.45,z+.45); boxAt('marbW',x0-.8,x0,8.4,9.4,3.2,12.8); }
   // 中の塊（回廊の外の部屋）と当たり
   const sh=new THREE.Shape(); sh.moveTo(x0+t-C5.cx,-(z0+t-C5.cz)); sh.lineTo(x1-t-C5.cx,-(z0+t-C5.cz)); sh.lineTo(x1-t-C5.cx,-(z1-t-C5.cz)); sh.lineTo(x0+t-C5.cx,-(z1-t-C5.cz)); sh.closePath(); const hp=new THREE.Path(); hp.absarc(0,0,20.6,0,TAU,true); sh.holes.push(hp);
   const g=new THREE.ShapeGeometry(sh,40); g.rotateX(-PI/2); bk(h2>=17?'lead':'stone').add(g,TM(C5.cx,Math.max(h1,h2)-.05,C5.cz));
   collide(x0,x1,z0,z0+t,0,20); collide(x0,x1,z1-t,z1,0,20); collide(x0,x0+t,z0,6,0,20); collide(x0,x0+t,10,z1,0,20); collide(x1-t,x1,z0,z1,0,20); }
 inEra('n',()=>{ c5Facades(9,17.4);
-  const {cx,cz}=C5; bk('stone').add(new THREE.CylinderGeometry(20.6,20.6,17,48,1,true,3*PI/2+.1,TAU-.2),TM(cx,8.5,cz)); bk('stone').add(new THREE.CylinderGeometry(20.6,20.6,11,6,1,true,3*PI/2-.1,.2),TM(cx,11.5,cz));
+  const {cx,cz}=C5; bk('stone').add(new THREE.CylinderGeometry(20.6,20.6,17,48,1,true,3*PI/2+.1,TAU-.2),TM(cx,8.5,cz,0,1,1,-1)); bk('stone').add(new THREE.CylinderGeometry(20.6,20.6,11,6,1,true,3*PI/2-.1,.2),TM(cx,11.5,cz,0,1,1,-1));
   for(let k=0;k<32;k++){ const a=k/32*TAU, x=cx+Math.cos(a)*15, z=cz+Math.sin(a)*15; cyl('stone',x,0,z,.42,6.5,12); boxAt('stone',x-.55,x+.55,6.5,6.9,z-.55,z+.55); collideCyl(x,z,.45,0,7); cyl('stone',x,9.4,z,.34,5.6,12); boxAt('stone',x-.45,x+.45,15,15.4,z-.45,z+.45); }
-  bk('stone').add(new THREE.CylinderGeometry(15.5,15.5,2.4,48,1,true),TM(cx,8.1,cz)); bk('stone').add(new THREE.CylinderGeometry(15.5,15.5,1.4,48,1,true),TM(cx,16.1,cz));
+  for(const f of [1,-1]){ bk('stone').add(new THREE.CylinderGeometry(15.5,15.5,2.4,48,1,true),TM(cx,8.1,cz,0,1,1,f)); bk('stone').add(new THREE.CylinderGeometry(15.5,15.5,1.4,48,1,true),TM(cx,16.1,cz,0,1,1,f)); bk('stone').add(new THREE.CylinderGeometry(15.5,15.5,.9,48,1,true),TM(cx,9.85,cz,0,1,1,f)); }
   const ring=new THREE.RingGeometry(15.4,20.6,48); ring.rotateX(PI/2); bk('stone').add(ring,TM(cx,6.9,cz)); const ring2=new THREE.RingGeometry(15.4,20.6,48); ring2.rotateX(-PI/2); bk('stone').add(ring2,TM(cx,9.3,cz)); const ring3=new THREE.RingGeometry(15.4,20.6,48); ring3.rotateX(PI/2); bk('stone').add(ring3,TM(cx,15.4,cz));
-  bk('stone').add(new THREE.CylinderGeometry(15.5,15.5,.9,48,1,true),TM(cx,9.85,cz)); for(let k=0;k<64;k++){ const a=k/64*TAU; cyl('stone',cx+Math.cos(a)*15.4,9.3,cz+Math.sin(a)*15.4,.07,.9,6); }
+  for(let k=0;k<64;k++){ const a=k/64*TAU; cyl('stone',cx+Math.cos(a)*15.4,9.3,cz+Math.sin(a)*15.4,.07,.9,6); }
   bk('teja').add(new THREE.CylinderGeometry(15.2,20.8,1.4,48,1,true),TM(cx,17.4,cz));
   ellPatch('stone',cx,cz,20.6,20.6,.05,48); ellPatch('emp',cx,cz,14.6,14.6,.07,48);
   boxAt('stone',-81.4,-75,0,9,5.4,6.2); boxAt('stone',-81.4,-75,0,9,9.8,10.6); ceil('stone',-83,-75,6.2,9.8,6); patch('stone',-83,-75,6.2,9.8,.05);
   lantern(-73,4,4.6); lantern(-73,4,11.4); });
 inEra('c',()=>{ c5Facades(6,6);
-  const {cx,cz}=C5; bk('stone').add(new THREE.CylinderGeometry(20.6,20.6,4,48,1,true,0,PI*1.3),TM(cx,2,cz));
+  const {cx,cz}=C5; for(const f of [1,-1]) bk('stone').add(new THREE.CylinderGeometry(20.6,20.6,4,48,1,true,0,PI*1.3),TM(cx,2,cz,0,1,1,f));
   for(let k=0;k<32;k++){ if(k%3===1) continue; const a=k/32*TAU, x=cx+Math.cos(a)*15, z=cz+Math.sin(a)*15; const hh=k%4===0?6.5:R(1.5,4); cyl('stone',x,0,z,.42,hh,12); collideCyl(x,z,.45,0,7); }
   ellPatch('earth',cx,cz,20.6,20.6,.06,40);
   for(let k=0;k<18;k++){ const x=R(C5.x0-3,C5.x1+3), z=pick([C5.z0-2,C5.z1+2]); strut('scaf',[x,0,z],[x,9,z],.07); } for(let k=0;k<18;k++){ const z=R(C5.z0,C5.z1), x=pick([C5.x0-2,C5.x1+2]); strut('scaf',[x,0,z],[x,9,z],.07); }
@@ -1296,7 +1296,7 @@ const ERASHORT={a:'ナスル朝',c:'カルロス5世',n:'現在'};
 function lvlOf(x,y,z){ if(x>NP.x0-1&&x<NP.x1&&z>NP.z0&&z<NP.z1&&y<20) return 'in'; if(x>236) return 'far'; return 'out'; }
 function inRect(x,z,a){ return x>a[0]&&x<a[1]&&z>a[2]&&z<a[3]; }
 const AREAS=[['ベラの塔の下',[-262,-238,-14,14]],['アルカサバ（武器の広場）',[-272,-171,-70,70]],['ワインの門',[-110,-98,8,22]],['貯水槽の広場',[-171,-112,-62,34]],['裁きの門',[-98,-82,70,90]],
-  ['カルロス5世宮殿の中庭',[-76,-34,-13,29],'n'],['カルロス5世宮殿（工事中）',[-83,-27,-20,36],'c'],['カルロス5世宮殿の前',[-100,-83,-10,30]],['ラウダ（王家の墓所）',[-26,1,-20,-4]],['サンタ・マリア教会の前',[-27,8,38,47],'n'],['王のモスクの前',[-27,8,38,47],'ac'],
+  ['カルロス5世宮殿の入口',[-84,-74.5,5,11],'n'],['カルロス5世宮殿の中庭',[-76,-34,-13,29],'n'],['カルロス5世宮殿（工事中）',[-83,-27,-20,36],'c'],['カルロス5世宮殿の前',[-100,-83,-10,30]],['ラウダ（王家の墓所）',[-26,1,-20,-4]],['サンタ・マリア教会の前',[-27,8,38,47],'n'],['王のモスクの前',[-27,8,38,47],'ac'],
   ['パルタル',[21,108,-104,-40]],['塔の小道',[108,232,-104,-40]],['サン・フランシスコ修道院の前',[126,166,6,48],'cn'],['カジェ・レアル（王の通り）',[-27,232,38,48]],['上の町（メディナ）',[-27,232,-40,90]],['東の門と橋',[220,262,-30,10]],['宮殿の南',[-112,-27,-20,90]]];
 function areaName(){ const lv=lvlOf(P.x,P.y,P.z), x=P.x, z=P.z;
   if(P.y>20&&x<-240) return 'ベラの塔の上';
