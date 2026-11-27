@@ -1460,6 +1460,8 @@ function stampShot(src){ const img=new Image(); img.onload=()=>{ const c=makeCan
 /* ============================================================
    メインループ
    ============================================================ */
+/* 世界さんぽディフェンス（?td のときだけ。defence-castle/world/ のゲームが画面とカメラを受け持つ） */
+const TD=/[?&]td\b/.test(location.search);
 let START=true, last=performance.now(), T0=performance.now(), stepAcc=0, bellT=40, birdT=6, reflT=0;
 const tmpV=new THREE.Vector3(), _q=new THREE.Quaternion(), _m=new THREE.Matrix4(), _s=new THREE.Vector3();
 let firstIn=false, firstLeo=false, firstFar=false, firstArr=false;
@@ -1517,7 +1519,7 @@ function step(dt,t){
 }
 let envK=0, miniT=0;
 function loop(now){ requestAnimationFrame(loop); const dt=Math.min(.1,(now-last)/1000); last=now; const t=(now-T0)/1000;
-  if(!START) step(dt,t); else { const a=t*.03; sun.intensity=TIMES[TIME].si; hemi.intensity=TIMES[TIME].hi; if(window.CAMO){ camera.position.set(CAMO[0],CAMO[1],CAMO[2]); camera.lookAt(CAMO[3],CAMO[4],CAMO[5]); } else { camera.position.set(-40+Math.sin(a)*6,1.9,-22+Math.cos(a)*1.2); camera.lookAt(-40,9,-75); } const d=window.SUND; sun.position.set(-40+d.x*400,d.y*400,-45+d.z*400); sun.target.position.set(-40,0,-45); sun.target.updateMatrixWorld(); renderer.shadowMap.needsUpdate=true; M.jet.map.offset.y=(t*.9)%1; }
+  if(TD&&window.SekaiTD&&SekaiTD.ready){ SekaiTD.frame(dt,t); if(typeof animWorld==='function') animWorld(dt,t); } else if(!START) step(dt,t); else { const a=t*.03; sun.intensity=TIMES[TIME].si; hemi.intensity=TIMES[TIME].hi; if(window.CAMO){ camera.position.set(CAMO[0],CAMO[1],CAMO[2]); camera.lookAt(CAMO[3],CAMO[4],CAMO[5]); } else { camera.position.set(-40+Math.sin(a)*6,1.9,-22+Math.cos(a)*1.2); camera.lookAt(-40,9,-75); } const d=window.SUND; sun.position.set(-40+d.x*400,d.y*400,-45+d.z*400); sun.target.position.set(-40,0,-45); sun.target.updateMatrixWorld(); renderer.shadowMap.needsUpdate=true; M.jet.map.offset.y=(t*.9)%1; }
   if(needRefl>0){ needRefl--; if(needRefl===0) updateRefl(); }
   sky.position.copy(camera.position); STARS.position.copy(camera.position);
   renderer.render(scene,camera);
@@ -1596,6 +1598,21 @@ function navUpdate(dt,t){ if(NAV.i<0) return; const s=SPOTS[NAV.i];
 function navMini(lv,scale,W){ if(NAV.i<0||!NAV.path) return; mg.strokeStyle='rgba(255,190,80,.95)'; mg.lineWidth=3; mg.setLineDash([5,4]); mg.beginPath(); let on=false;
   for(let k=NAV.k;k<NAV.path.length;k++){ const q=NAV.path[k]; const x=(q[0]-P.x)*scale+W/2, z=(q[1]-P.z)*scale+W/2; if(on) mg.lineTo(x,z); else { mg.moveTo(x,z); on=true; } } mg.stroke(); mg.setLineDash([]); }
 
+</script>
+<script>
+/* 世界さんぽディフェンスの入口（?td のときだけ。地形・高さ・時代の切り替えをゲームに渡して、defence-castle/world/ を読む） */
+if(TD){
+  $('start').hidden=true;
+  if(typeof setTide==='function'&&typeof tideStep==='function'){ setTide(0,true); tideStep(60); }   /* 潮が引いた干潟を敵が渡ってくる */
+  const GF=typeof groundY==='function'?groundY:typeof groundAt==='function'?((x,z)=>{ const v=groundAt(x,z); return v==null?0:v; }):typeof terrH==='function'?terrH:(()=>0);
+  window.__sekai={THREE,scene,camera,renderer,hemi:typeof hemi!=='undefined'?hemi:null,sun:typeof sun!=='undefined'?sun:null,setEra,setQual:typeof setQual==='function'?setQual:null,
+    groundY:GF,surfaceAt,blocked,
+    hy:(x,z,y)=>{ const g=GF(x,z); const s=surfaceAt(x,z,y==null?g+12:y); return s>-1e8?Math.max(g,s):g; },
+    keep:(typeof sky!=='undefined'?[sky]:[]).concat(typeof TERR!=='undefined'?TERR:[],typeof LAKES!=='undefined'?LAKES:[],typeof WATERS!=='undefined'?WATERS:[],typeof WATER!=='undefined'&&WATER&&WATER.isObject3D?[WATER]:[]),
+    hide:()=>[window.PIM,typeof PIMn!=='undefined'?PIMn:null,typeof PIMp!=='undefined'?PIMp:null].filter(Boolean)};
+  window.TD_MAP='alhambra'; window.TD_GAME_URL='/defence-castle/world/';
+  for(const src of ['/defence-castle/world/stages.js','/defence-castle/world/maps/alhambra.js','/defence-castle/world/td.js']){ const sc=document.createElement('script'); sc.src=src; sc.async=false; document.body.appendChild(sc); }
+}
 </script>
 <!-- sekai-portal:begin（世界さんぽ入口へ戻るボタン・各名所共通。このブロックごと </body> の直前に貼る） -->
 <style>
